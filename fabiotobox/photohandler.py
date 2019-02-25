@@ -23,8 +23,8 @@ class PhotoHandler:
             y = 10 + index * 260
             print("pos {0},{1} size {2},{3}".format(x, y, w, h))
             result.paste(img, (x, y, x + w, y + h))
-
-        result.save(os.path.expanduser(output_name))
+            
+        result.save(output_name)
         return output_name
 
     def polaroid(self, file_path: str) -> str:
@@ -34,20 +34,20 @@ class PhotoHandler:
         )
 
         img = Image.open(file_path)
-        thumb = ImageOps.fit(img, (1250, 1250), Image.ANTIALIAS)
+        thumb = ImageOps.fit(img, (1200, 1200), Image.ANTIALIAS)
 
         template = Image.open(POLAROID_TEMPLATE)
 
         result = Image.new("RGB", template.size)
         result.paste(thumb, (100, 100))
-        result.paste(template)
+        result.paste(template, (0,0), template)
 
-        result.save(os.path.expanduser(output_name))
+        result.save(output_name)
         return output_name
 
     def generate_photo_name(self):
         now = datetime.now()
-        picture_name = now.strftime("%Y%m%d_%H%M%S")
+        picture_name = now.strftime("%Y%m%d_%H%M%S.jpeg")
         output_name = os.path.join(self.storage_dir, picture_name)
         return output_name
 

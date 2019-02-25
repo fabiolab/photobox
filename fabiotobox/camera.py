@@ -43,7 +43,8 @@ class Camera:
         return pictures
 
     def countdown(self, start: int = 3):
-        for i in range(start, 1):
+        for i in range(start, 0, -1):
+            logger.debug("Countdown {}".format(i))
             self.camera.annotate_text = "{}".format(i)
             sleep(1)
         self.camera.annotate_text = ""
@@ -71,6 +72,7 @@ class Camera:
     def display_image(self, image: str, delay: int = 3):
         logger.debug("Displaying {} for {} seconds".format(image, delay))
         img = Image.open(image)
+        thumbnail = img.thumbnail(self.camera.resolution, Image.ANTIALIAS)
 
         # The width must be a multiple of 32
         # The height must be a multiple of 16

@@ -2,7 +2,7 @@ from gpiozero import Button
 from time import sleep
 from datetime import datetime
 import picamera
-from PIL import Image
+from PIL import Image, ImageDraw
 import os
 import sys
 
@@ -50,6 +50,25 @@ def shoot(num_pic:int=3) -> list:
         sleep(1)
 
     shot = combine(picture_name, pictures)
+    print("sending photo to tumblr")
+    client.create_photo("fabiotobox", state="queue", tags=["testing", "ok"],
+                    tweet="Woah this is an incredible sweet post [URL]",
+                    data=shot)
+
+
+
+def _add_corners(im, rad=100):
+    circle = Image.new('L', (rad * 2, rad * 2), 0)
+    draw = ImageDraw.Draw(circle)
+    draw.ellipse((0, 0, rad * 2, rad * 2), fill=255)
+    alpha = Image.new('L', im.size, "white")
+    w, h = im.size
+    alpha.paste(circle.crop((0, 0, rad, rad)), (0, 0))
+    alpha.paste(circle.crop((0, rad, rad, rad * 2)), (0, h - rad))
+    alpha.paste(circle.crop((rad, 0, rad * 2, rad)), (w - rad, 0))
+    alpha.paste(circle.crop((rad, rad, rad * 2, rad * 2)), (w - rad, h - rad))
+    im.putalpha(alpha)
+    return im
 
 def combine(base_name:str, files:list) -> str:
     output_name = '{}.jpeg'.format(base_name)
@@ -59,6 +78,7 @@ def combine(base_name:str, files:list) -> str:
     for index, file in enumerate(files):
         path = os.path.expanduser(file)
         img = Image.open(path)
+        img = _add_corners(img)
         img.thumbnail((400, 400), Image.ANTIALIAS)
         w, h = img.size
         x = 10
@@ -70,6 +90,7 @@ def combine(base_name:str, files:list) -> str:
     o = display(output_name)
     sleep(3)
     camera.remove_overlay(o)
+    return output_name
 
 def display(image):
     img = Image.open(image)
@@ -104,15 +125,28 @@ def display(image):
     o.layer = 3
     return o
 
+import pytumblr
+
+client = pytumblr.TumblrRestClient(
+  'N89rMJVwVBR0IrjZ8tRK3WJkGhIDQQT8Cr0zJ33sVVxSToOpno',
+  'TdKV5P0mCmGII2WFYUuQFe0xAwsvi1wrW7OhGZ9ydOKDSoOQpS',
+  '387VYuXTw8X3VigZiT1YAuGDIIbFcM43Ff4fMUlbkyKT2FT0dy',
+  'dErS8RPiyLUcWMkxhMsNWM2kLfA9KskYGo0gbEbl5Q1VykstFk'
+)
+
+client.info()
+
+
 camera = picamera.PiCamera()
 camera.rotation = 180
 camera.flash_mode = "auto"
-#camera.preview_fullscreen=False
 camera.annotate_text_size = 160
-camera.start_preview(resolution=(camera.resolution[0]//2, camera.resolution[1]//2))
-                     #fullscreen=False,
-                     #window = (300, 100, 640, 480))
+# camera.color_effects = (128,128) # turn camera to black and white
+camera.start_preview(resolution=(camera.resolution[0]//2, camera.resolution[1]//2),
+                     fullscreen=False,
+                     window = (300, 100, 640, 480))
 
 button = Button(18)
 button.when_pressed = shoot
 button.when_held = end
+
