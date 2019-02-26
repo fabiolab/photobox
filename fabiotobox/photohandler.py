@@ -23,7 +23,7 @@ class PhotoHandler:
             y = 10 + index * 260
             print("pos {0},{1} size {2},{3}".format(x, y, w, h))
             result.paste(img, (x, y, x + w, y + h))
-            
+
         result.save(output_name)
         return output_name
 
@@ -40,7 +40,7 @@ class PhotoHandler:
 
         result = Image.new("RGB", template.size)
         result.paste(thumb, (100, 100))
-        result.paste(template, (0,0), template)
+        result.paste(template, (0, 0), template)
 
         result.save(output_name)
         return output_name
