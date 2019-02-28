@@ -10,7 +10,7 @@ import click
 @click.option(
     "--event_title", prompt="Event Title", help="Title for tumblr posts description"
 )
-def run():
+def run(event_title):
     logger.debug("Running fabiotobox ...")
     camera = Camera(storage_dir="photos/", rotate=180, fullscreen=False)
     photo_handler = PhotoHandler(storage_dir="photos/")

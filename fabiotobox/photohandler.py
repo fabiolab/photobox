@@ -14,15 +14,17 @@ class PhotoHandler:
         output_name = self.generate_photo_name()
         logger.debug("Combine {} in {} output".format(files, output_name))
 
-        result = Image.new("RGB", (420, 790))
+        # first pic gives the resolution
+        width, height = Image.open(files[0]).size
+        border = 100
+
+        result = Image.new("RGB", (width + 2*border, 3*height + 4*border))
         for index, file in enumerate(files):
             img = Image.open(file)
-            img.thumbnail((400, 400), Image.ANTIALIAS)
-            w, h = img.size
-            x = 10
-            y = 10 + index * 260
-            print("pos {0},{1} size {2},{3}".format(x, y, w, h))
-            result.paste(img, (x, y, x + w, y + h))
+            # img.thumbnail((200, 400), Image.ANTIALIAS)
+            x = border
+            y = border + index * (height + border)
+            result.paste(img, (x, y, x + width, y + height))
 
         result.save(output_name)
         return output_name
@@ -38,7 +40,7 @@ class PhotoHandler:
 
         template = Image.open(POLAROID_TEMPLATE)
 
-        result = Image.new("RGB", template.size)
+        result = Image.new("RGB", template.size, (255, 255, 255, 0))
         result.paste(thumb, (100, 100))
         result.paste(template, (0, 0), template)
 

@@ -23,8 +23,10 @@ class Fabiotobox:
         event_title: str = "Test",
     ):
         self.shoot_button = Button(shoot_button_port)
-        self.effect_button = Button(effect_button_port)
-        self.format_button = Button(format_button_port)
+        if effect_button_port:
+            self.effect_button = Button(effect_button_port)
+        if format_button_port:
+            self.format_button = Button(format_button_port)
         self.camera = camera
         self.photo_handler = photo_handler
         self.tumblr = tumblr

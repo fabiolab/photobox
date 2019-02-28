@@ -37,6 +37,7 @@ class Camera:
         pictures = self.generate_photo_names(num_pictures)
         for pic in pictures:
             self.flash()
+            logger.debug("Shooting {}".format(pic))
             self.camera.capture(pic)
             sleep(1)
 
