@@ -12,14 +12,14 @@ import click
 )
 def run(event_title):
     logger.debug("Running fabiotobox ...")
-    camera = Camera(storage_dir="photos/", rotate=180, fullscreen=False)
+    camera = Camera(storage_dir="photos/", rotate=0, fullscreen=True)
     photo_handler = PhotoHandler(storage_dir="photos/")
     tumblr = Tumblr(
         "N89rMJVwVBR0IrjZ8tRK3WJkGhIDQQT8Cr0zJ33sVVxSToOpno",
         "TdKV5P0mCmGII2WFYUuQFe0xAwsvi1wrW7OhGZ9ydOKDSoOQpS",
         "387VYuXTw8X3VigZiT1YAuGDIIbFcM43Ff4fMUlbkyKT2FT0dy",
         "dErS8RPiyLUcWMkxhMsNWM2kLfA9KskYGo0gbEbl5Q1VykstFk",
-        blog_name="fabiotobox",
+        blog_name="manonetguillaume",
     )
     fabiotobox = Fabiotobox(
         camera=camera, photo_handler=photo_handler, tumblr=tumblr, shoot_button_port=18
