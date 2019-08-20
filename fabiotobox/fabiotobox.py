@@ -7,6 +7,7 @@ from enum import IntEnum
 import pendulum
 import glob
 import random
+import sys
 
 SCREENSAVER_DELAY = 5
 PHOTO_DIR = "/tmp"
@@ -31,7 +32,7 @@ class Fabiotobox:
         shoot_button_port: int,
         effect_button_port: int = None,
         format_button_port: int = None,
-        event_title: str = "Test",
+        event_title: str = "Test"
     ):
         self.shoot_button = Button(shoot_button_port)
         if effect_button_port:
@@ -69,6 +70,8 @@ class Fabiotobox:
             logger.debug("Button pressed for a photo")
             photo = self.handle_button_pressed()
             self.camera.display_image(photo)
+            sys.sleep(3)
+            self.camera.undisplay_image()
 
             logger.info("Sending {} to tumblr".format(photo))
             self.tumblr.post_photo(photo, self.event_title, [])
@@ -77,9 +80,13 @@ class Fabiotobox:
         if self.shoot_button.is_pressed:
             logger.debug("Button pressed for exiting diaporama")
             self.mode = Mode.PHOTOBOX
+            self.camera.undisplay_image()
             self.reset_diaporama_countdown()
         else:
-            self.camera.display_image(random.choice(self.photos))
+            if self.is_diaporama_countdown_reached():
+                self.camera.undisplay_image()
+                self.camera.display_image(random.choice(self.photos))
+                self.reset_diaporama_countdown()
 
     def handle_button_pressed(self) -> str:
         if self.photo_format == PhotoFormat.POLAROID:

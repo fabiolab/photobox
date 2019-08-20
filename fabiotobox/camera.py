@@ -70,8 +70,8 @@ class Camera:
         logger.info("End of the party !")
         self.camera.close()
 
-    def display_image(self, image: str, delay: int = 3):
-        logger.debug("Displaying {} for {} seconds".format(image, delay))
+    def display_image(self, image: str):
+        logger.debug("Displaying {}".format(image))
         img = Image.open(image)
         thumbnail = img.thumbnail(self.camera.resolution, Image.ANTIALIAS)
 
@@ -102,5 +102,6 @@ class Camera:
         # By default, the overlay is in layer 0, beneath the preview (which defaults to layer 2)
         o.layer = 3
 
-        sleep(delay)
-        self.camera.remove_overlay(o)
+    def undisplay_image(self):
+        for o in self.camera.overlays:
+            self.camera.remove_overlay(o)
