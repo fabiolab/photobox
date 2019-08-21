@@ -7,10 +7,10 @@ from enum import IntEnum
 import pendulum
 import glob
 import random
-import sys
+import time
 
-SCREENSAVER_DELAY = 5
-PHOTO_DIR = "/tmp"
+SCREENSAVER_DELAY = 1
+PHOTO_DIR = "photos"
 
 
 class PhotoFormat(IntEnum):
@@ -42,10 +42,10 @@ class Fabiotobox:
         self.camera = camera
         self.photo_handler = photo_handler
         self.tumblr = tumblr
-        self.photo_format = PhotoFormat.PHOTOBOX
+        self.photo_format = PhotoFormat.POLAROID
         self.event_title = event_title
         self.mode = Mode.PHOTOBOX
-        self.diaporama_countdown = pendulum.datetime()
+        self.diaporama_countdown = pendulum.now('Europe/Paris')
         self.photos = list()
 
     def run(self):
@@ -70,7 +70,7 @@ class Fabiotobox:
             logger.debug("Button pressed for a photo")
             photo = self.handle_button_pressed()
             self.camera.display_image(photo)
-            sys.sleep(3)
+            time.sleep(3)
             self.camera.undisplay_image()
 
             logger.info("Sending {} to tumblr".format(photo))
@@ -84,7 +84,7 @@ class Fabiotobox:
             self.reset_diaporama_countdown()
         else:
             if self.is_diaporama_countdown_reached():
-                self.camera.undisplay_image()
+                # self.camera.undisplay_image()
                 self.camera.display_image(random.choice(self.photos))
                 self.reset_diaporama_countdown()
 
@@ -99,14 +99,14 @@ class Fabiotobox:
         return photo
 
     def reset_diaporama_countdown(self):
-        self.diaporama_countdown = pendulum.datetime().add(minutes=SCREENSAVER_DELAY)
+        self.diaporama_countdown = pendulum.now('Europe/Paris').add(minutes=SCREENSAVER_DELAY)
 
     def is_diaporama_countdown_reached(self) -> bool:
-        return self.diaporama_countdown > pendulum.datetime()
+        return self.diaporama_countdown < pendulum.now('Europe/Paris')
 
-    def load_photo(self, dir_path: str):
-        logger.debug(f"Loading photos from {dir_path}")
+    def load_photos(self, dir_path: str):
+        logger.debug("Loading photos from {}".format(dir_path))
         self.photos = [
-            filename for filename in glob.glob(f"{dir_path}/**/*", recursive=True)
+            filename for filename in glob.glob("{}/**/*.jpeg".format(dir_path), recursive=True)
         ]
-        logger.debug(f"{len(self.photos)} photos loaded from {dir_path}")
+        logger.debug("{} photos loaded from {}".format(len(self.photos), dir_path))
