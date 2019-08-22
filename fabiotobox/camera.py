@@ -101,7 +101,16 @@ class Camera:
 
         # By default, the overlay is in layer 0, beneath the preview (which defaults to layer 2)
         o.layer = 3
+        
+        self.remove_old_layers(o)
+
+    # Remove all layers but the given
+    def remove_old_layers(self, layer):
+        for o in self.camera.overlays:
+            if o is not layer:
+                self.camera.remove_overlay(o)
 
     def undisplay_image(self):
+        logger.debug("Removing {} overlays".format(len(self.camera.overlays)))
         for o in self.camera.overlays:
             self.camera.remove_overlay(o)

@@ -10,7 +10,7 @@ import random
 import time
 
 SCREENSAVER_DELAY = 1
-PHOTO_DIR = "photos"
+PHOTO_DIR = "/media/pi/2078B0CD25633F53/Backup/2018-a-trier"
 
 
 class PhotoFormat(IntEnum):
@@ -57,8 +57,6 @@ class Fabiotobox:
         while True:
             if self.is_diaporama_countdown_reached():
                 self.mode = Mode.DIAPORAMA
-            else:
-                self.mode = Mode.PHOTOBOX
 
             if self.mode is Mode.PHOTOBOX:
                 self.run_photobox()
@@ -75,6 +73,7 @@ class Fabiotobox:
 
             logger.info("Sending {} to tumblr".format(photo))
             self.tumblr.post_photo(photo, self.event_title, [])
+            self.reset_diaporama_countdown()
 
     def run_diaporama(self):
         if self.shoot_button.is_pressed:
@@ -82,6 +81,7 @@ class Fabiotobox:
             self.mode = Mode.PHOTOBOX
             self.camera.undisplay_image()
             self.reset_diaporama_countdown()
+            time.sleep(1)  # prevent event to be catch by photobox
         else:
             if self.is_diaporama_countdown_reached():
                 # self.camera.undisplay_image()
@@ -107,6 +107,7 @@ class Fabiotobox:
     def load_photos(self, dir_path: str):
         logger.debug("Loading photos from {}".format(dir_path))
         self.photos = [
-            filename for filename in glob.glob("{}/**/*.jpeg".format(dir_path), recursive=True)
+            filename for filename in glob.glob("{}/**/*.[jJ][pP]*[gG]".format(dir_path), recursive=True)
         ]
         logger.debug("{} photos loaded from {}".format(len(self.photos), dir_path))
+        
