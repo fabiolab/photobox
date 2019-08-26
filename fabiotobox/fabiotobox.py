@@ -8,9 +8,10 @@ import pendulum
 import glob
 import random
 import time
+from pathlib import Path
 
 SCREENSAVER_DELAY = 1
-PHOTO_DIR = "/media/pi/2078B0CD25633F53/Backup/2018-a-trier"
+PHOTO_DIR = "/media/pi/2078B0CD25633F53/Backup/Photos/2016"
 
 
 class PhotoFormat(IntEnum):
@@ -111,3 +112,7 @@ class Fabiotobox:
         ]
         logger.debug("{} photos loaded from {}".format(len(self.photos), dir_path))
         
+    def list_subdir(self, dir_path: str):
+        logger.debug("Loading dirs from {}".format(dir_path))
+        path = Path(dir_path)
+        self.dirs = [ folder.name for folder in path.rglob("*") if folder.is_dir() ]
