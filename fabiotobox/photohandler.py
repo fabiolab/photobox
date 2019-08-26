@@ -5,11 +5,12 @@ from loguru import logger
 
 POLAROID_TEMPLATE = "static/templates/polaroid_template.png"
 
+
 def add_corners(im, rad=100):
-    circle = Image.new('L', (rad * 2, rad * 2), 0)
+    circle = Image.new("L", (rad * 2, rad * 2), 0)
     draw = ImageDraw.Draw(circle)
     draw.ellipse((0, 0, rad * 2, rad * 2), fill=255)
-    alpha = Image.new('L', im.size, 255)
+    alpha = Image.new("L", im.size, 255)
     w, h = im.size
     alpha.paste(circle.crop((0, 0, rad, rad)), (0, 0))
     alpha.paste(circle.crop((0, rad, rad, rad * 2)), (0, h - rad))
@@ -23,7 +24,7 @@ class PhotoHandler:
     def __init__(self, storage_dir: str):
         self.storage_dir = storage_dir
 
-    def combine(self, files: list) -> str:
+    def make_photostrip(self, files: list) -> str:
         output_name = self.generate_photo_name()
         logger.debug("Combine {} in {} output".format(files, output_name))
 
@@ -31,7 +32,7 @@ class PhotoHandler:
         width, height = Image.open(files[0]).size
         border = 100
 
-        result = Image.new("RGB", (width + 2*border, 3*height + 4*border))
+        result = Image.new("RGB", (width + 2 * border, 3 * height + 4 * border))
         for index, file in enumerate(files):
             img = Image.open(file)
             # img.thumbnail((200, 400), Image.ANTIALIAS)
@@ -42,10 +43,10 @@ class PhotoHandler:
         result.save(output_name)
         return output_name
 
-    def polaroid(self, file_path: str) -> str:
+    def make_polaroid(self, file_path: str) -> str:
         output_name = self.generate_photo_name()
         logger.debug(
-            "Make a polaroid shot whith {} to {}".format(file_path, output_name)
+            "Make a make_polaroid shot whith {} to {}".format(file_path, output_name)
         )
 
         img = Image.open(file_path)
