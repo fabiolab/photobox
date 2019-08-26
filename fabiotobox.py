@@ -2,22 +2,24 @@ from loguru import logger
 from fabiotobox.fabiotobox import Fabiotobox
 from fabiotobox.camera import Camera
 from fabiotobox.photohandler import PhotoHandler
+from fabiotobox.diaporama import Diaporama
 from fabiotobox.tumblr import Tumblr
-import click
+
+PHOTO_DIR = "/media/pi/2078B0CD25633F53/Backup/Photos/2016"
 
 
-# @click.command()
-# @click.option(
-#    "--event_title", prompt="Event Title", help="Title for tumblr posts description"
-#)
 def run():
     logger.debug("Running fabiotobox ...")
     camera = Camera(storage_dir="photos/", rotate=0, fullscreen=True)
+    diapo = Diaporama(PHOTO_DIR)
     photo_handler = PhotoHandler(storage_dir="photos/")
-    tumblr = Tumblr(
-    )
+    tumblr = Tumblr()
     fabiotobox = Fabiotobox(
-        camera=camera, photo_handler=photo_handler, tumblr=tumblr, shoot_button_port=18
+        camera=camera,
+        diaporama=diapo,
+        photo_handler=photo_handler,
+        tumblr=tumblr,
+        shoot_button_port=18,
     )
     fabiotobox.run()
 

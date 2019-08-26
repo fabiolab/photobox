@@ -1,17 +1,14 @@
 from loguru import logger
 from gpiozero import Button
 from fabiotobox.camera import Camera
+from fabiotobox.diaporama import Diaporama
 from fabiotobox.photohandler import PhotoHandler
 from fabiotobox.tumblr import Tumblr
 from enum import IntEnum
 import pendulum
-import glob
-import random
 import time
-from pathlib import Path
 
 SCREENSAVER_DELAY = 1
-PHOTO_DIR = "/media/pi/2078B0CD25633F53/Backup/Photos/2016"
 
 
 class PhotoFormat(IntEnum):
@@ -29,11 +26,12 @@ class Fabiotobox:
         self,
         camera: Camera,
         photo_handler: PhotoHandler,
+        diaporama: Diaporama,
         tumblr: Tumblr,
         shoot_button_port: int,
         effect_button_port: int = None,
         format_button_port: int = None,
-        event_title: str = "Test"
+        event_title: str = "Test",
     ):
         self.shoot_button = Button(shoot_button_port)
         if effect_button_port:
@@ -42,15 +40,14 @@ class Fabiotobox:
             self.format_button = Button(format_button_port)
         self.camera = camera
         self.photo_handler = photo_handler
+        self.diaporama = diaporama
         self.tumblr = tumblr
         self.photo_format = PhotoFormat.POLAROID
         self.event_title = event_title
         self.mode = Mode.PHOTOBOX
-        self.diaporama_countdown = pendulum.now('Europe/Paris')
-        self.photos = list()
+        self.diaporama_countdown = pendulum.now("Europe/Paris")
 
     def run(self):
-        self.load_photos(PHOTO_DIR)
         self.shoot_button.when_held = self.camera.end
         self.camera.start_preview()
         self.reset_diaporama_countdown()
@@ -67,7 +64,7 @@ class Fabiotobox:
     def run_photobox(self):
         if self.shoot_button.is_pressed:
             logger.debug("Button pressed for a photo")
-            photo = self.handle_button_pressed()
+            photo = self.shoot_photo()
             self.camera.display_image(photo)
             time.sleep(3)
             self.camera.undisplay_image()
@@ -82,37 +79,26 @@ class Fabiotobox:
             self.mode = Mode.PHOTOBOX
             self.camera.undisplay_image()
             self.reset_diaporama_countdown()
-            time.sleep(1)  # prevent event to be catch by photobox
+            time.sleep(1)  # prevent event to be catched by photobox too
         else:
             if self.is_diaporama_countdown_reached():
-                # self.camera.undisplay_image()
-                self.camera.display_image(random.choice(self.photos))
+                self.camera.display_image(self.diaporama.pick_photo())
                 self.reset_diaporama_countdown()
 
-    def handle_button_pressed(self) -> str:
+    def shoot_photo(self) -> str:
         if self.photo_format == PhotoFormat.POLAROID:
             pictures = self.camera.shoot(1)
-            photo = self.photo_handler.polaroid(pictures[0])
+            photo = self.photo_handler.make_polaroid(pictures[0])
         else:
             pictures = self.camera.shoot(3)
-            photo = self.photo_handler.combine(pictures)
+            photo = self.photo_handler.make_photostrip(pictures)
 
         return photo
 
     def reset_diaporama_countdown(self):
-        self.diaporama_countdown = pendulum.now('Europe/Paris').add(minutes=SCREENSAVER_DELAY)
+        self.diaporama_countdown = pendulum.now("Europe/Paris").add(
+            minutes=SCREENSAVER_DELAY
+        )
 
     def is_diaporama_countdown_reached(self) -> bool:
-        return self.diaporama_countdown < pendulum.now('Europe/Paris')
-
-    def load_photos(self, dir_path: str):
-        logger.debug("Loading photos from {}".format(dir_path))
-        self.photos = [
-            filename for filename in glob.glob("{}/**/*.[jJ][pP]*[gG]".format(dir_path), recursive=True)
-        ]
-        logger.debug("{} photos loaded from {}".format(len(self.photos), dir_path))
-        
-    def list_subdir(self, dir_path: str):
-        logger.debug("Loading dirs from {}".format(dir_path))
-        path = Path(dir_path)
-        self.dirs = [ folder.name for folder in path.rglob("*") if folder.is_dir() ]
+        return self.diaporama_countdown < pendulum.now("Europe/Paris")
