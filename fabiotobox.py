@@ -11,7 +11,7 @@ PHOTO_DIR = "/media/pi/2078B0CD25633F53/Backup/Photos"
 def run():
     logger.debug("Running fabiotobox ...")
     camera = Camera(storage_dir="photos/", rotate=0, fullscreen=True)
-    diapo = Diaporama(PHOTO_DIR)
+    diapo = Diaporama(photo_folder=PHOTO_DIR)
     photo_handler = PhotoHandler(storage_dir="photos/")
     tumblr = Tumblr(
         "N89rMJVwVBR0IrjZ8tRK3WJkGhIDQQT8Cr0zJ33sVVxSToOpno",
