@@ -82,6 +82,7 @@ class Fabiotobox:
             time.sleep(1)  # prevent event to be catched by photobox too
         else:
             if self.is_diaporama_countdown_reached():
+                logger.info("dirs : {}".format(len(self.diaporama.dirs)))
                 self.camera.display_image(self.diaporama.pick_photo())
                 self.reset_diaporama_countdown()
 
