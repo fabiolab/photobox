@@ -29,6 +29,7 @@ class Diaporama:
         ]
         
         if not photos:
-            logger.error("No photo in this path {}".format(random_dir))
+            logger.info("No photo in this path {}".format(random_dir))
+            return None
 
         return random.choice(photos)
