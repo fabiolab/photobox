@@ -76,7 +76,7 @@ class WeatherService:
 
         # For each day, get only the forecast in the range 12:00 to 14:00 (forecast are given by range of 3 hours)
         for weather in forecast:
-            if weather.datetime.day > dt.day and weather.datetime.hour in [12, 13, 14]:
+            if weather.datetime.hour in [12, 13, 14]:
                 forecast_by_day.append(weather)
 
         return forecast_by_day

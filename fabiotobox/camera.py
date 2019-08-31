@@ -73,6 +73,9 @@ class Camera:
     def display_image(self, image: str):
         logger.debug("Displaying {}".format(image))
         img = Image.open(image)
+        self.display_image(img)
+
+    def display_pil_image(self, img: Image):
         thumbnail = img.thumbnail(self.camera.resolution, Image.ANTIALIAS)
 
         # The width must be a multiple of 32

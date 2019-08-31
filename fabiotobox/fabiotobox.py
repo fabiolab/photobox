@@ -3,6 +3,7 @@ from gpiozero import Button
 from fabiotobox.camera import Camera
 from fabiotobox.diaporama import Diaporama
 from fabiotobox.photohandler import PhotoHandler
+from fabiotobox.dashboard import Dashboard
 from fabiotobox.tumblr import Tumblr
 from enum import IntEnum
 import pendulum
@@ -19,6 +20,7 @@ class PhotoFormat(IntEnum):
 class Mode(IntEnum):
     PHOTOBOX = 0
     DIAPORAMA = 1
+    DASHBOARD = 2
 
 
 class Fabiotobox:
@@ -27,6 +29,7 @@ class Fabiotobox:
         camera: Camera,
         photo_handler: PhotoHandler,
         diaporama: Diaporama,
+        dashboard: Dashboard,
         tumblr: Tumblr,
         shoot_button_port: int,
         effect_button_port: int = None,
@@ -41,6 +44,7 @@ class Fabiotobox:
         self.camera = camera
         self.photo_handler = photo_handler
         self.diaporama = diaporama
+        self.dashboard = dashboard
         self.tumblr = tumblr
         self.photo_format = PhotoFormat.POLAROID
         self.event_title = event_title
@@ -58,8 +62,10 @@ class Fabiotobox:
 
             if self.mode is Mode.PHOTOBOX:
                 self.run_photobox()
-            else:
+            elif self.mode is Mode.DIAPORAMA:
                 self.run_diaporama()
+            elif self.mode is Mode.DASHBOARD:
+                self.run_dashboard()
 
     def run_photobox(self):
         if self.shoot_button.is_pressed:
@@ -76,18 +82,26 @@ class Fabiotobox:
     def run_diaporama(self):
         if self.shoot_button.is_pressed:
             logger.debug("Button pressed for exiting diaporama")
-            self.mode = Mode.PHOTOBOX
+            self.mode = Mode.DASHBOARD
             self.camera.undisplay_image()
             self.reset_diaporama_countdown()
             time.sleep(1)  # prevent event to be catched by photobox too
         else:
             if self.is_diaporama_countdown_reached():
-                logger.info("dirs : {}".format(len(self.diaporama.dirs)))
                 new_picture = self.diaporama.pick_photo()
                 # Picture can be none : then, just reset countdown
                 if new_picture is not None:
-                        self.camera.display_image(new_picture)
+                    self.camera.display_image(new_picture)
                 self.reset_diaporama_countdown()
+
+    def run_dashboard(self):
+        self.mode = Mode.DIAPORAMA
+        self.camera.undisplay_image()
+        self.reset_diaporama_countdown()
+        self.dashboard.update_dashboard()
+        self.camera.display_pil_image(self.dashboard.image)
+        self.reset_diaporama_countdown()
+        time.sleep(10)
 
     def shoot_photo(self) -> str:
         if self.photo_format == PhotoFormat.POLAROID:

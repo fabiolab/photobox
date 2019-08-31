@@ -22,8 +22,10 @@ if __name__ == "__main__":
     forecast = my_weather_service.get_forecast_weather_by_day()
 
     dash = Dashboard()
+    dash.add_weather(weather, 50, 50, 100, 50)
     for i, w in enumerate(forecast):
-        dash.add_weather(w, 100 + 500 * i, 400, 50)
+        dash.add_weather(w, 200 + 220 * (i+1), 50)
 
+    dash.add_date(size=100)
     dash.image.show()
     logger.info("Init done !")
