@@ -11,7 +11,6 @@ import time
 
 SCREENSAVER_DELAY = 1
 
-
 class PhotoFormat(IntEnum):
     PHOTOBOX = 0
     POLAROID = 1
@@ -83,7 +82,6 @@ class Fabiotobox:
         if self.shoot_button.is_pressed:
             logger.debug("Button pressed for exiting diaporama")
             self.mode = Mode.DASHBOARD
-            self.camera.undisplay_image()
             self.reset_diaporama_countdown()
             time.sleep(1)  # prevent event to be catched by photobox too
         else:
@@ -95,13 +93,14 @@ class Fabiotobox:
                 self.reset_diaporama_countdown()
 
     def run_dashboard(self):
-        self.mode = Mode.DIAPORAMA
-        self.camera.undisplay_image()
-        self.reset_diaporama_countdown()
-        self.dashboard.update_dashboard()
-        self.camera.display_pil_image(self.dashboard.image)
-        self.reset_diaporama_countdown()
-        time.sleep(10)
+        if self.shoot_button.is_pressed:
+            logger.debug("Button pressed for exiting dashboard")
+            self.mode = Mode.PHOTOBOX
+            self.camera.undisplay_image()
+            time.sleep(1)  # prevent event to be catched by photobox too
+        else:
+            self.dashboard.update_dashboard()
+            self.camera.display_pil_image(self.dashboard.image)
 
     def shoot_photo(self) -> str:
         if self.photo_format == PhotoFormat.POLAROID:

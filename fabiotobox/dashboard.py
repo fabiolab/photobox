@@ -123,6 +123,8 @@ class Dashboard:
         return img.resize((wsize, hsize), Image.ANTIALIAS)
 
     def update_dashboard(self):
+        self.image = Dashboard.init_dashboard()
+
         weather = self.weather_service.get_current_weather()
         forecast = self.weather_service.get_forecast_weather_by_day()
 

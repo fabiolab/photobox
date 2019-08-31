@@ -4,6 +4,7 @@ from loguru import logger
 import requests
 from typing import List
 from urllib.parse import urljoin
+from expiringdict import ExpiringDict
 
 
 class WeatherService:
@@ -21,8 +22,12 @@ class WeatherService:
         self.forecast_url = urljoin(base_url, end_point_forecast)
         self.city = city
         self.appid = appid
+        self.cache = ExpiringDict(max_len=100, max_age_seconds=3600)
 
     def get_current_weather(self) -> Weather:
+        if self.cache.get("weather", None):
+            return self.cache.get("weather")
+            
         logger.info("Getting current weather")
         parameter = {"q": self.city, "APPID": self.appid, "units": "metric"}
         try:
@@ -38,12 +43,17 @@ class WeatherService:
                 raise e
             response_json = response.json()
             current_weather = self.parse_single_weather(response_json)
+            self.cache["weather"] = current_weather
             return current_weather
         except Exception as e:
             logger.error(e)
             raise e
 
+
     def get_forecast_weather(self) -> List[Weather]:
+        if self.cache.get("forecast_weather", None):
+            return self.cache.get("forecast_weather")
+
         logger.info("Getting forecast weather")
         parameter = {"q": self.city, "APPID": self.appid, "units": "metric"}
         try:
@@ -61,6 +71,7 @@ class WeatherService:
                 self.parse_single_weather(forecast)
                 for forecast in response_json.get("list", [])
             ]
+            self.cache["forecast_weather"] = forecast_weather
             return forecast_weather
         except Exception as e:
             logger.error(e)
