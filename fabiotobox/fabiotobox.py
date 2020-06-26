@@ -69,8 +69,9 @@ class Fabiotobox:
             time.sleep(3)
             self.camera.undisplay_image()
 
-            logger.info("Sending {} to tumblr".format(photo))
-            self.tumblr.post_photo(photo, self.event_title, [])
+            if self.tumblr is not None:
+                logger.info("Sending {} to tumblr".format(photo))
+                self.tumblr.post_photo(photo, self.event_title, [])
             self.reset_diaporama_countdown()
 
     def run_diaporama(self):
