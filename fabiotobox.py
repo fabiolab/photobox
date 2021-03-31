@@ -1,3 +1,5 @@
+import os
+
 from loguru import logger
 from fabiotobox.fabiotobox import Fabiotobox
 from fabiotobox.camera import Camera
@@ -5,7 +7,7 @@ from fabiotobox.photohandler import PhotoHandler
 from fabiotobox.diaporama import Diaporama
 from fabiotobox.tumblr import Tumblr
 
-PHOTO_DIR = "/media/pi/2078B0CD25633F53/Backup/Photos"
+PHOTO_DIR = os.environ.get("PHOTO_DIR")
 
 
 def run():
@@ -14,12 +16,11 @@ def run():
     diapo = Diaporama(photo_folder=PHOTO_DIR)
     photo_handler = PhotoHandler(storage_dir="photos/")
     tumblr = Tumblr(
-        "N89rMJVwVBR0IrjZ8tRK3WJkGhIDQQT8Cr0zJ33sVVxSToOpno",
-        "TdKV5P0mCmGII2WFYUuQFe0xAwsvi1wrW7OhGZ9ydOKDSoOQpS",
-        "387VYuXTw8X3VigZiT1YAuGDIIbFcM43Ff4fMUlbkyKT2FT0dy",
-        "dErS8RPiyLUcWMkxhMsNWM2kLfA9KskYGo0gbEbl5Q1VykstFk",
-        # blog_name="manonetguillaume",
-        blog_name="fabiotobox",
+        os.environ.get("CONSUMER_KEY"),
+        os.environ.get("CONSUMER_SECRET"),
+        os.environ.get("OAUTH_TOKEN"),
+        os.environ.get("OAUTH_SECRET"),
+        os.environ.get("BLOG_NAME")
     )
     fabiotobox = Fabiotobox(
         camera=camera,

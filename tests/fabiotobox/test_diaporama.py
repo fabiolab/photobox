@@ -38,5 +38,5 @@ def test_createcache():
     assert [
         "photos/test/foo/test01.jpg",
         "photos/test/test02.JPEG",
-        "photos/test/test03.jPg"
+        "photos/test/test03.jPg",
     ] == photos

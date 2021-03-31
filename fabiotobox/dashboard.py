@@ -55,7 +55,9 @@ class Dashboard:
             size,
         )
         self.add_image("static/icons/{}.png".format(weather.icon), pos_x, pos_y)
-        self.add_text("{}°".format(int(weather.temperature)), pos_x + 50, pos_y + 200, size)
+        self.add_text(
+            "{}°".format(int(weather.temperature)), pos_x + 50, pos_y + 200, size
+        )
 
     def validate(self):
         self.image.save(DASHBOARD_IMG)

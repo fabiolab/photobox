@@ -87,7 +87,7 @@ class Fabiotobox:
                 new_picture = self.diaporama.pick_photo()
                 # Picture can be none : then, just reset countdown
                 if new_picture is not None:
-                        self.camera.display_image(new_picture)
+                    self.camera.display_image(new_picture)
                 self.reset_diaporama_countdown()
 
     def shoot_photo(self) -> str:

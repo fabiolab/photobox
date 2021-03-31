@@ -101,7 +101,7 @@ class Camera:
 
         # By default, the overlay is in layer 0, beneath the preview (which defaults to layer 2)
         o.layer = 3
-        
+
         self.remove_old_layers(o)
 
     # Remove all layers but the given

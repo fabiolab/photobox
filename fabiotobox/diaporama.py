@@ -11,10 +11,8 @@ class Diaporama:
     def list_dirs(folder: str, max_depth: int = 2):
         logger.debug("Loading dirs and subdirs from {}".format(folder))
         path = Path(folder)
-        
-        dirs = [
-            str(PosixPath(folder)) for folder in path.glob("*/" * max_depth)
-        ]
+
+        dirs = [str(PosixPath(folder)) for folder in path.glob("*/" * max_depth)]
 
         return dirs
 
@@ -27,7 +25,7 @@ class Diaporama:
             for filename in path.glob("*.[jJ][pP]*[gG]")
             if filename.is_file()
         ]
-        
+
         if not photos:
             logger.info("No photo in this path {}".format(random_dir))
             return None
